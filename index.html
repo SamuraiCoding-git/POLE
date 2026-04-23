@@ -1,0 +1,1226 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <link rel="icon" href="ПОЛЕ.png" type="image/png">
+  <title>ПОЛЕ</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          colors: {
+            graphite: "#e6fffb",
+            slate: "rgba(210, 244, 255, 0.72)",
+            rosso: "#86efff",
+            cloud: "rgba(255, 255, 255, 0.02)",
+            line: "rgba(255, 255, 255, 0.1)",
+            panel: "#07192A",
+            steel: "rgba(134, 239, 255, 0.06)",
+            mist: "rgba(230, 255, 251, 0.86)",
+            sand: "#cffff2",
+            ink: "#07192A",
+            field: "#86efff",
+            white: "#FFFFFF",
+          },
+          fontFamily: {
+            sans: ["Inter", "Montserrat", "system-ui", "sans-serif"],
+            display: ["Inter", "Montserrat", "system-ui", "sans-serif"],
+            pricedown: ["Inter", "Montserrat", "system-ui", "sans-serif"],
+            diploma: ["Inter", "Montserrat", "system-ui", "sans-serif"],
+            mono: ["JetBrains Mono", "SFMono-Regular", "ui-monospace", "monospace"],
+          },
+          letterSpacing: {
+            tighter2: "-0.04em",
+          },
+          boxShadow: {
+            speed: "0 0 36px rgba(134, 239, 255, 0.2)",
+            panel: "0 30px 120px rgba(3, 10, 22, 0.7)",
+          },
+        },
+      },
+    };
+  </script>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@500;700&family=Montserrat:wght@300;400;500;600&display=swap" rel="stylesheet" />
+  <style>
+    html {
+      scroll-behavior: smooth;
+    }
+
+    :root {
+      --field: #86efff;
+      --field-soft: rgba(134, 239, 255, 0.05);
+      --field-mid: rgba(134, 239, 255, 0.14);
+      --field-strong: rgba(134, 239, 255, 0.28);
+      --field-text: rgba(230, 255, 251, 0.94);
+      --field-muted: rgba(210, 244, 255, 0.68);
+      --field-line: rgba(214, 247, 255, 0.12);
+      --field-panel: rgba(5, 17, 39, 0.82);
+      --field-glow: 0 0 14px rgba(134, 239, 255, 0.08), 0 0 40px rgba(175, 255, 240, 0.04);
+      --ink: #051127;
+      --ink-deep: #030b18;
+      --ink-mid: #0a1a36;
+      --field-mint: #cffff2;
+      --field-blue: #66ccff;
+      --bar-danger: linear-gradient(90deg, rgba(134, 239, 255, 0.95), rgba(207, 255, 242, 0.42));
+      --bar-armor: linear-gradient(90deg, rgba(255, 255, 255, 0.82), rgba(102, 204, 255, 0.32));
+    }
+
+    body {
+      background:
+        radial-gradient(circle at 50% 42%, rgba(2, 8, 18, 0.26), rgba(2, 8, 18, 0) 34%),
+        radial-gradient(circle at 50% 50%, rgba(255, 255, 255, 0.004), rgba(255, 255, 255, 0) 72%),
+        linear-gradient(180deg, #051127 0%, #051127 100%);
+      position: relative;
+      min-height: 100vh;
+      color: var(--field-text);
+      font-family: "Inter", "Montserrat", system-ui, sans-serif;
+    }
+
+    body::before {
+      content: "";
+      position: fixed;
+      inset: 0;
+      background:
+        radial-gradient(circle at 50% 18%, rgba(134, 239, 255, 0.016), transparent 30%),
+        radial-gradient(circle at 50% 50%, rgba(207, 255, 242, 0.009), transparent 38%);
+      mix-blend-mode: screen;
+      opacity: 0.18;
+      pointer-events: none;
+      z-index: 0;
+    }
+
+    body::after {
+      content: "";
+      position: fixed;
+      inset: 0;
+      background:
+        radial-gradient(rgba(255, 255, 255, 0.012) 0.7px, transparent 0.8px),
+        linear-gradient(rgba(255, 255, 255, 0.006) 0.5px, transparent 0.5px),
+        linear-gradient(90deg, rgba(255, 255, 255, 0.006) 0.5px, transparent 0.5px);
+      background-size: 4px 4px, 120px 120px, 120px 120px;
+      opacity: 0.04;
+      pointer-events: none;
+      z-index: 0;
+    }
+
+    .screen-fx {
+      position: fixed;
+      inset: 0;
+      pointer-events: none;
+      z-index: 2;
+      opacity: 0.05;
+      background:
+        linear-gradient(rgba(255, 255, 255, 0.01) 1px, transparent 1px),
+        radial-gradient(circle at 50% 0%, rgba(134, 239, 255, 0.035), transparent 38%);
+      background-size: 100% 5px, 100% 100%;
+      mix-blend-mode: soft-light;
+    }
+
+    .fade-section {
+      opacity: 0;
+      transform: translateY(22px);
+      will-change: opacity, transform;
+      transition: opacity 1.5s cubic-bezier(0.2, 0, 0.2, 1), transform 1.5s cubic-bezier(0.2, 0, 0.2, 1), filter 1.5s cubic-bezier(0.2, 0, 0.2, 1);
+      filter: blur(12px);
+    }
+
+    .fade-section.is-visible {
+      opacity: 1;
+      transform: translateY(0);
+      filter: blur(0);
+    }
+
+    .panel {
+      position: relative;
+      overflow: hidden;
+      border: 0.5px solid rgba(255, 255, 255, 0.1);
+      background:
+        linear-gradient(180deg, rgba(255, 255, 255, 0.012), rgba(255, 255, 255, 0.004)),
+        linear-gradient(135deg, rgba(134, 239, 255, 0.024), transparent 38%),
+        rgba(5, 17, 39, 0.84);
+      box-shadow:
+        0 24px 90px rgba(0, 0, 0, 0.62),
+        inset 0 1px 0 rgba(255, 255, 255, 0.02),
+        var(--field-glow);
+      backdrop-filter: blur(24px);
+    }
+
+    .panel::before {
+      content: "";
+      position: absolute;
+      inset: 0;
+      background:
+        linear-gradient(135deg, rgba(255, 255, 255, 0.01) 0 10%, transparent 10% 30%, rgba(134, 239, 255, 0.014) 30% 34%, transparent 34% 100%);
+      opacity: 0.52;
+      pointer-events: none;
+    }
+
+    .panel::after {
+      content: "";
+      position: absolute;
+      inset: auto 1.5rem 0 1.5rem;
+      height: 1px;
+      background: linear-gradient(90deg, transparent, rgba(134, 239, 255, 0.18), transparent);
+      opacity: 0.48;
+      pointer-events: none;
+    }
+
+    .noise::after {
+      content: "";
+      position: absolute;
+      inset: 0;
+      opacity: 0.035;
+      background-image:
+        radial-gradient(rgba(255, 255, 255, 0.05) 0.7px, transparent 0.9px),
+        linear-gradient(rgba(134, 239, 255, 0.018) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(134, 239, 255, 0.018) 1px, transparent 1px);
+      background-size: 3px 3px, 96px 96px, 96px 96px;
+      mask-image: linear-gradient(180deg, rgba(0, 0, 0, 0.55), transparent 92%);
+      pointer-events: none;
+    }
+
+    .eyebrow {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      width: 100%;
+      font-family: "Inter", "Montserrat", system-ui, sans-serif;
+      font-size: 0.82rem;
+      font-weight: 300;
+      letter-spacing: 0.2em;
+      text-transform: uppercase;
+      color: rgba(215, 255, 251, 0.72);
+      text-align: center;
+    }
+
+    .eyebrow::before {
+      content: none;
+    }
+
+    .hero-grid {
+      background:
+        radial-gradient(circle at left top, rgba(102, 204, 255, 0.025), transparent 34%),
+        radial-gradient(circle at 50% 0, rgba(207, 255, 242, 0.014), transparent 32%),
+        linear-gradient(180deg, rgba(255, 255, 255, 0.008), rgba(255, 255, 255, 0));
+    }
+
+    .metric-card {
+      border: 0.5px solid rgba(255, 255, 255, 0.1);
+      background:
+        linear-gradient(180deg, rgba(255, 255, 255, 0.01), rgba(255, 255, 255, 0.004)),
+        rgba(5, 17, 39, 0.8);
+      position: relative;
+      overflow: hidden;
+      box-shadow:
+        inset 0 0 0 1px rgba(255, 255, 255, 0.025),
+        0 0 0 1px rgba(64, 224, 208, 0.02);
+      backdrop-filter: blur(24px);
+    }
+
+    .metric-card::before {
+      content: "";
+      position: absolute;
+      inset: 0 auto auto 0;
+      width: 100%;
+      height: 1px;
+      background: linear-gradient(90deg, rgba(64, 224, 208, 0.75), rgba(64, 224, 208, 0));
+      opacity: 1;
+    }
+
+    .metric-card strong {
+      display: block;
+      margin-top: 0.55rem;
+      font-family: "Inter", "Montserrat", system-ui, sans-serif;
+      font-size: 1.15rem;
+      line-height: 1.2;
+      letter-spacing: 0.08em;
+      font-weight: 300;
+      text-transform: uppercase;
+      color: rgba(255, 255, 255, 0.92);
+    }
+
+    .pitlane-easter {
+      position: fixed;
+      right: 18px;
+      bottom: 18px;
+      z-index: 30;
+      display: flex;
+      align-items: flex-end;
+      justify-content: flex-end;
+      pointer-events: auto;
+      text-decoration: none;
+    }
+
+    .pitlane-card {
+      width: min(280px, calc(100vw - 36px));
+      padding: 0.8rem;
+      border: 0.5px solid rgba(255, 255, 255, 0.1);
+      border-radius: 24px;
+      background:
+        linear-gradient(180deg, rgba(255, 255, 255, 0.01), rgba(255, 255, 255, 0.004)),
+        rgba(5, 17, 39, 0.86);
+      box-shadow: 0 20px 60px rgba(0, 0, 0, 0.55), var(--field-glow);
+      backdrop-filter: blur(24px);
+      opacity: 0;
+      transform: translateY(10px) scale(0.98);
+      transition: opacity 0.6s cubic-bezier(0.2, 0, 0.2, 1), transform 0.6s cubic-bezier(0.2, 0, 0.2, 1);
+      pointer-events: none;
+    }
+
+    .pitlane-copy {
+      margin-top: 0.85rem;
+      padding: 0.9rem 0.2rem 0.1rem;
+      text-align: center;
+    }
+
+    .pitlane-thumb {
+      width: 100%;
+      overflow: hidden;
+    }
+
+    .pitlane-thumb img {
+      width: 100%;
+      display: block;
+      opacity: 0.96;
+    }
+
+    .pitlane-label {
+      font-family: "JetBrains Mono", monospace;
+      font-size: 11px;
+      letter-spacing: 0.22em;
+      text-transform: uppercase;
+      color: rgba(210, 244, 255, 0.52);
+    }
+
+    .pitlane-title {
+      margin-top: 0.45rem;
+      font-family: "Inter", "Montserrat", system-ui, sans-serif;
+      font-size: 1rem;
+      font-weight: 300;
+      letter-spacing: 0.16em;
+      text-transform: uppercase;
+      line-height: 1.25;
+      color: rgba(255, 255, 255, 0.9);
+    }
+
+    .pitlane-note {
+      margin-top: 0.55rem;
+      font-size: 0.92rem;
+      line-height: 1.7;
+      color: rgba(210, 244, 255, 0.7);
+    }
+
+    .pitlane-trigger {
+      position: absolute;
+      right: 0;
+      bottom: 0;
+      display: inline-flex;
+      align-items: center;
+      gap: 0.6rem;
+      padding: 0.8rem 1rem;
+      border: 0.5px solid rgba(64, 224, 208, 0.42);
+      border-radius: 999px;
+      background: rgba(5, 17, 39, 0.86);
+      box-shadow: 0 0 0 1px rgba(64, 224, 208, 0.08), 0 0 32px rgba(64, 224, 208, 0.12);
+      font-family: "JetBrains Mono", monospace;
+      font-size: 11px;
+      letter-spacing: 0.22em;
+      text-transform: uppercase;
+      color: rgba(215, 255, 251, 0.86);
+      text-decoration: none;
+      pointer-events: auto;
+      transition: transform 0.6s cubic-bezier(0.2, 0, 0.2, 1), border-color 0.6s cubic-bezier(0.2, 0, 0.2, 1), background 0.6s cubic-bezier(0.2, 0, 0.2, 1), box-shadow 0.6s cubic-bezier(0.2, 0, 0.2, 1), color 0.6s cubic-bezier(0.2, 0, 0.2, 1);
+    }
+
+    .pitlane-trigger-icon {
+      width: 1.5rem;
+      height: 1.5rem;
+      object-fit: contain;
+      display: block;
+      filter: brightness(1.18) saturate(1.02) opacity(0.92);
+    }
+
+    .pitlane-trigger:hover {
+      transform: translateY(-1px);
+      border-color: rgba(64, 224, 208, 0.78);
+      background: rgba(8, 25, 47, 0.96);
+      box-shadow: 0 0 0 1px rgba(64, 224, 208, 0.15), 0 0 42px rgba(64, 224, 208, 0.18);
+    }
+
+    .pitlane-easter:hover .pitlane-card,
+    .pitlane-easter:focus-within .pitlane-card {
+      opacity: 1;
+      transform: translateY(-62px) scale(1);
+      pointer-events: auto;
+    }
+
+    @media (max-width: 639px) {
+      .pitlane-trigger span:last-child {
+        display: none;
+      }
+    }
+
+    .card-surface {
+      transition: transform 0.8s cubic-bezier(0.2, 0, 0.2, 1), border-color 0.8s cubic-bezier(0.2, 0, 0.2, 1), background 0.8s cubic-bezier(0.2, 0, 0.2, 1), box-shadow 0.8s cubic-bezier(0.2, 0, 0.2, 1), filter 0.8s cubic-bezier(0.2, 0, 0.2, 1);
+      position: relative;
+      box-shadow:
+        inset 0 0 0 1px rgba(255, 255, 255, 0.025),
+        0 20px 40px rgba(0, 0, 0, 0.22);
+    }
+
+    .card-surface:hover {
+      transform: translateY(-4px) scale(1.008);
+      border-color: rgba(64, 224, 208, 0.34);
+      background: linear-gradient(180deg, rgba(134, 239, 255, 0.03), rgba(255, 255, 255, 0.01));
+      box-shadow:
+        0 30px 60px rgba(0, 0, 0, 0.3),
+        0 0 38px rgba(64, 224, 208, 0.12),
+        inset 0 0 0 1px rgba(64, 224, 208, 0.08);
+      filter: brightness(1.04);
+    }
+
+    .is-ethereal-active {
+      border-color: rgba(64, 224, 208, 0.4) !important;
+      box-shadow:
+        0 0 0 1px rgba(64, 224, 208, 0.12),
+        0 0 40px rgba(64, 224, 208, 0.16),
+        0 20px 50px rgba(0, 0, 0, 0.28) !important;
+      background: linear-gradient(180deg, rgba(134, 239, 255, 0.03), rgba(255, 255, 255, 0.01)) !important;
+    }
+
+    .cta-button {
+      background: rgba(5, 17, 39, 0.86);
+      border: 0.5px solid rgba(64, 224, 208, 0.5);
+      border-radius: 999px;
+      box-shadow: 0 0 0 1px rgba(64, 224, 208, 0.08), 0 0 30px rgba(64, 224, 208, 0.1);
+      color: rgba(215, 255, 251, 0.94) !important;
+      text-shadow: none;
+      transform: translate(0, 0);
+      backdrop-filter: blur(18px);
+    }
+
+    .cta-button:hover {
+      background: rgba(8, 25, 47, 0.96);
+      transform: translateY(-1px);
+      box-shadow: 0 0 0 1px rgba(64, 224, 208, 0.18), 0 0 42px rgba(64, 224, 208, 0.18);
+    }
+
+    .section-divider {
+      border-top: 0.5px solid rgba(255, 255, 255, 0.1);
+    }
+
+    @media (prefers-reduced-motion: reduce) {
+      html {
+        scroll-behavior: auto;
+      }
+
+      .fade-section {
+        opacity: 1;
+        transform: none;
+        transition: none;
+      }
+    }
+
+    h1 {
+      text-align: center;
+      text-transform: uppercase;
+      letter-spacing: 0.2em;
+      font-family: "Inter", "Montserrat", system-ui, sans-serif;
+      font-weight: 300;
+      line-height: 1;
+      text-shadow: 0 0 28px rgba(64, 224, 208, 0.12);
+    }
+
+    h2 {
+      text-align: center;
+      text-transform: uppercase;
+      font-family: "Inter", "Montserrat", system-ui, sans-serif;
+      font-weight: 300;
+      letter-spacing: 0.2em;
+      text-shadow: 0 0 24px rgba(64, 224, 208, 0.08);
+    }
+
+    h3 {
+      text-transform: uppercase;
+      letter-spacing: 0.2em;
+      font-family: "Inter", "Montserrat", system-ui, sans-serif;
+      font-weight: 300;
+      line-height: 1.35;
+    }
+
+    main {
+      position: relative;
+      z-index: 1;
+    }
+
+    .hero-art {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      width: min(100%, 28rem);
+      margin: 0 auto 1.75rem;
+      padding: 1rem;
+      border: 0.5px solid rgba(255, 255, 255, 0.1);
+      border-radius: 2rem;
+      background:
+        radial-gradient(circle at center, rgba(134, 239, 255, 0.05), transparent 62%),
+        rgba(5, 17, 39, 0.78);
+      backdrop-filter: blur(18px);
+      animation: pulseField 9s ease-in-out infinite;
+    }
+
+    .hero-art::before,
+    .hero-art::after {
+      content: "";
+      position: absolute;
+      inset: 10%;
+      border-radius: 999px;
+      pointer-events: none;
+      opacity: 0.9;
+    }
+
+    .hero-art::before {
+      background:
+        radial-gradient(circle at center, transparent 44%, rgba(134, 239, 255, 0.18) 45%, transparent 47%),
+        radial-gradient(circle at center, transparent 57%, rgba(207, 255, 242, 0.18) 58%, transparent 60%);
+      filter: blur(2px);
+    }
+
+    .hero-art::after {
+      inset: 5%;
+      background:
+        conic-gradient(from 0deg, transparent 0 8%, rgba(134, 239, 255, 0.18) 12%, transparent 18%, rgba(207, 255, 242, 0.16) 24%, transparent 31%, rgba(102, 204, 255, 0.18) 36%, transparent 44%, rgba(134, 239, 255, 0.16) 52%, transparent 60%, rgba(207, 255, 242, 0.15) 68%, transparent 76%, rgba(102, 204, 255, 0.16) 84%, transparent 92%, rgba(134, 239, 255, 0.18) 100%);
+      mask: radial-gradient(circle at center, transparent 0 34%, #000 42% 72%, transparent 80%);
+      filter: blur(8px);
+      animation: spinField 30s linear infinite;
+    }
+
+    .hero-art img {
+      width: 100%;
+      height: auto;
+      object-fit: contain;
+      display: block;
+      position: relative;
+      z-index: 1;
+      filter: brightness(1.1) contrast(1.02) saturate(1.06) drop-shadow(0 0 26px rgba(134, 239, 255, 0.2));
+    }
+
+    .hero-art img.map-color {
+      opacity: 0.05;
+    }
+
+    .video-frame {
+      box-shadow:
+        inset 0 0 0 1px rgba(255, 255, 255, 0.05),
+        0 24px 70px rgba(0, 0, 0, 0.34),
+        0 0 36px rgba(64, 224, 208, 0.08);
+    }
+
+    .gta-card {
+      box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.05);
+    }
+
+    .gta-card::after {
+      content: "";
+      position: absolute;
+      inset: auto 1.15rem 1rem auto;
+      width: 2.5rem;
+      height: 2.5rem;
+      border-right: 0.5px solid rgba(64, 224, 208, 0.18);
+      border-bottom: 0.5px solid rgba(64, 224, 208, 0.18);
+      pointer-events: none;
+    }
+
+    .join-box {
+      background:
+        linear-gradient(180deg, rgba(255, 255, 255, 0.01), rgba(255, 255, 255, 0.004)),
+        rgba(5, 17, 39, 0.88);
+      box-shadow:
+        inset 0 0 0 1px rgba(255, 255, 255, 0.05),
+        0 0 50px rgba(64, 224, 208, 0.08);
+    }
+
+    .offer-card {
+      position: relative;
+      overflow: hidden;
+      gap: 1rem;
+      border-radius: 30px;
+      border: 0.5px solid rgba(255, 255, 255, 0.1);
+      background:
+        linear-gradient(180deg, rgba(134, 239, 255, 0.02), rgba(255, 255, 255, 0.004)),
+        rgba(5, 17, 39, 0.9);
+      box-shadow:
+        inset 0 0 0 1px rgba(255, 255, 255, 0.04),
+        0 24px 70px rgba(0, 0, 0, 0.34),
+        0 0 44px rgba(64, 224, 208, 0.08);
+      backdrop-filter: blur(24px);
+    }
+
+    .offer-card::before {
+      content: "";
+      position: absolute;
+      inset: 0;
+      background:
+        linear-gradient(rgba(255, 255, 255, 0.03) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(64, 224, 208, 0.025) 1px, transparent 1px);
+      background-size: 100% 5px, 90px 90px;
+      opacity: 0.18;
+      pointer-events: none;
+    }
+
+    .offer-card > * {
+      position: relative;
+      z-index: 1;
+    }
+
+    .offer-meta {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 0.8rem;
+      flex-wrap: wrap;
+      width: 100%;
+    }
+
+    .offer-hud {
+      display: flex;
+      justify-content: flex-end;
+      align-items: flex-start;
+      width: 100%;
+    }
+
+    .offer-fist {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      width: 100%;
+      padding: 0.9rem;
+      border: 0.5px solid rgba(214, 247, 255, 0.08);
+      border-radius: 26px;
+      background:
+        radial-gradient(circle at center, rgba(134, 239, 255, 0.08), transparent 62%),
+        rgba(4, 13, 30, 0.72);
+      box-shadow:
+        inset 0 0 0 1px rgba(255, 255, 255, 0.018),
+        0 0 32px rgba(134, 239, 255, 0.06);
+    }
+
+    .offer-fist img {
+      display: block;
+      width: 100%;
+      max-width: 15rem;
+      height: auto;
+      object-fit: contain;
+      filter: brightness(1.08) contrast(1.02) saturate(1.04) drop-shadow(0 0 26px rgba(134, 239, 255, 0.16));
+      opacity: 0.92;
+    }
+
+    .offer-side {
+      display: grid;
+      gap: 0.75rem;
+    }
+
+    .offer-timer {
+      justify-self: start;
+      padding: 0.4rem 0.75rem;
+      border: 0.5px solid rgba(255, 255, 255, 0.1);
+      border-radius: 12px;
+      background: rgba(5, 17, 39, 0.84);
+      box-shadow: 0 0 24px rgba(64, 224, 208, 0.08);
+      font-family: "Inter", "Montserrat", system-ui, sans-serif;
+      font-size: clamp(2rem, 5vw, 3.2rem);
+      line-height: 1;
+      letter-spacing: 0.2em;
+      font-weight: 300;
+      color: rgba(255, 255, 255, 0.88);
+    }
+
+    .offer-mini-bar {
+      width: min(100%, 16rem);
+      height: 1.2rem;
+      padding: 0.18rem;
+      border: 0.5px solid rgba(255, 255, 255, 0.1);
+      background: rgba(5, 17, 39, 0.84);
+      box-shadow: 0 0 20px rgba(64, 224, 208, 0.06);
+    }
+
+    .offer-mini-fill {
+      width: 36%;
+      height: 100%;
+      background: linear-gradient(90deg, rgba(255, 255, 255, 0.7), rgba(64, 224, 208, 0.28));
+    }
+
+    .offer-health {
+      width: 100%;
+      height: 1.45rem;
+      padding: 0.16rem;
+      border: 0.5px solid rgba(255, 255, 255, 0.1);
+      background: rgba(5, 17, 39, 0.84);
+      box-shadow: 0 0 24px rgba(64, 224, 208, 0.06);
+    }
+
+    .offer-health-fill {
+      width: 100%;
+      height: 100%;
+      background: linear-gradient(180deg, rgba(64, 224, 208, 0.85), rgba(64, 224, 208, 0.35));
+    }
+
+    .offer-copy {
+      max-width: 28rem;
+      margin: 0 auto;
+      font-family: "Inter", "Montserrat", system-ui, sans-serif;
+      font-size: 1rem;
+      line-height: 1.75;
+      color: rgba(215, 255, 251, 0.72);
+      text-align: center;
+    }
+
+    .offer-copy strong {
+      color: rgba(255, 255, 255, 0.92);
+      font-weight: 500;
+    }
+
+    .offer-note {
+      font-family: "JetBrains Mono", monospace;
+      font-size: 11px;
+      letter-spacing: 0.28em;
+      text-transform: uppercase;
+      color: rgba(215, 255, 251, 0.5);
+      text-align: center;
+    }
+
+    .easter-card-note {
+      margin-top: 0.75rem;
+      padding: 0.8rem 0.9rem;
+      border: 0.5px solid rgba(255, 255, 255, 0.1);
+      border-radius: 16px;
+      background: rgba(5, 17, 39, 0.84);
+    }
+
+    .easter-card-note strong {
+      display: block;
+      font-family: "Inter", "Montserrat", system-ui, sans-serif;
+      font-size: 1rem;
+      letter-spacing: 0.2em;
+      font-weight: 300;
+      text-transform: uppercase;
+      color: rgba(255, 255, 255, 0.92);
+    }
+
+    .easter-card-note span {
+      display: block;
+      margin-top: 0.2rem;
+      font-family: "JetBrains Mono", monospace;
+      font-size: 11px;
+      letter-spacing: 0.16em;
+      text-transform: uppercase;
+      color: rgba(215, 255, 251, 0.52);
+    }
+
+    .hero-stack {
+      max-width: 74rem;
+      margin: 0 auto;
+      text-align: center;
+    }
+
+    .hero-actions {
+      justify-content: center;
+    }
+
+    .hero-metrics {
+      margin-left: auto;
+      margin-right: auto;
+    }
+
+    .section-heading {
+      position: relative;
+    }
+
+    .section-heading::after {
+      content: "ПОЛЕ / RESONANCE";
+      display: block;
+      margin-top: 0.85rem;
+      font-family: "JetBrains Mono", monospace;
+      font-size: 10px;
+      letter-spacing: 0.32em;
+      text-transform: uppercase;
+      text-align: center;
+      color: rgba(210, 244, 255, 0.34);
+    }
+
+    .hud-bars {
+      display: flex;
+      gap: 0.75rem;
+      justify-content: center;
+      align-items: center;
+      margin: 0 auto 1.25rem;
+      flex-wrap: wrap;
+    }
+
+    .hud-bar {
+      width: min(100%, 240px);
+    }
+
+    .hud-bar-label {
+      display: flex;
+      justify-content: space-between;
+      margin-bottom: 0.3rem;
+      font-family: "JetBrains Mono", monospace;
+      font-size: 10px;
+      letter-spacing: 0.18em;
+      text-transform: uppercase;
+      color: rgba(215, 255, 251, 0.62);
+    }
+
+    .hud-bar-track {
+      height: 16px;
+      padding: 2px;
+      border: 0.5px solid rgba(255, 255, 255, 0.1);
+      background: rgba(5, 17, 39, 0.84);
+      box-shadow: 0 0 24px rgba(64, 224, 208, 0.06);
+    }
+
+    .hud-bar-fill {
+      height: 100%;
+      width: var(--fill, 100%);
+      background: var(--bar-color, var(--bar-danger));
+      box-shadow: 0 0 18px rgba(64, 224, 208, 0.16);
+    }
+
+    .wanted-level {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.7rem;
+      padding: 0.7rem 1rem;
+      border: 0.5px solid rgba(255, 255, 255, 0.1);
+      background: rgba(5, 17, 39, 0.84);
+      box-shadow: 0 0 24px rgba(64, 224, 208, 0.08);
+      backdrop-filter: blur(18px);
+      border-radius: 999px;
+    }
+
+    .signal-orbit {
+      width: 0.9rem;
+      height: 0.9rem;
+      border-radius: 999px;
+      border: 0.5px solid rgba(255, 255, 255, 0.18);
+      background: radial-gradient(circle at center, rgba(207, 255, 242, 0.92), rgba(134, 239, 255, 0.18) 45%, transparent 72%);
+      box-shadow: 0 0 18px rgba(134, 239, 255, 0.2);
+      transition: transform 0.8s cubic-bezier(0.2, 0, 0.2, 1), box-shadow 0.8s cubic-bezier(0.2, 0, 0.2, 1), opacity 0.8s cubic-bezier(0.2, 0, 0.2, 1);
+    }
+
+    .signal-orbit:nth-child(2) {
+      transform: scale(1.18);
+    }
+
+    .signal-orbit:nth-child(3) {
+      transform: scale(0.9);
+    }
+
+    .cta-wrap:hover .signal-orbit {
+      animation: pulseField 5s ease-in-out infinite;
+    }
+
+    .money-strip {
+      width: min(100%, 34rem);
+      margin: 0 auto;
+      padding: 0.35rem 0.45rem;
+      border: 0;
+      border-radius: 0;
+      background:
+        transparent;
+      box-shadow: none;
+    }
+
+    .money-strip img {
+      display: block;
+      width: 100%;
+      height: auto;
+      image-rendering: -webkit-optimize-contrast;
+    }
+
+    .offer-stars {
+      display: flex;
+      justify-content: center;
+      gap: 0.35rem;
+      flex-wrap: nowrap;
+    }
+
+    .map-overlay {
+      position: absolute;
+      inset: 0;
+      opacity: 0.14;
+      background:
+        radial-gradient(circle at 18% 32%, rgba(134, 239, 255, 0.8) 0 3px, transparent 3px),
+        radial-gradient(circle at 68% 38%, rgba(255, 255, 255, 0.7) 0 3px, transparent 3px),
+        radial-gradient(circle at 46% 72%, rgba(207, 255, 242, 0.7) 0 3px, transparent 3px),
+        linear-gradient(135deg, transparent 0 15%, rgba(255, 255, 255, 0.12) 15% 16%, transparent 16% 100%),
+        linear-gradient(35deg, transparent 0 28%, rgba(102, 204, 255, 0.1) 28% 29%, transparent 29% 100%),
+        radial-gradient(circle at 22% 30%, rgba(255, 255, 255, 0.14) 0 10%, transparent 10% 100%),
+        radial-gradient(circle at 72% 36%, rgba(134, 239, 255, 0.12) 0 12%, transparent 12% 100%),
+        linear-gradient(90deg, rgba(255, 255, 255, 0.08) 1px, transparent 1px),
+        linear-gradient(rgba(255, 255, 255, 0.08) 1px, transparent 1px);
+      background-size: auto, auto, auto, auto, auto, auto, auto, 48px 48px, 48px 48px;
+      pointer-events: none;
+      mask-image: radial-gradient(circle at center, rgba(0, 0, 0, 0.95), transparent 92%);
+    }
+
+    .map-overlay::before {
+      content: "ПОЛЕ / КАРТА ЭНЕРГИИ";
+      position: absolute;
+      top: 1rem;
+      right: 1rem;
+      font-family: "JetBrains Mono", monospace;
+      font-size: 10px;
+      letter-spacing: 0.26em;
+      color: rgba(215, 255, 251, 0.42);
+    }
+
+    .map-overlay::after {
+      content: "ПОЛЕ";
+      position: absolute;
+      left: 16%;
+      top: 27%;
+      font-family: "JetBrains Mono", monospace;
+      font-size: 9px;
+      letter-spacing: 0.22em;
+      color: rgba(207, 255, 242, 0.56);
+    }
+
+    .scanline {
+      position: relative;
+      overflow: hidden;
+    }
+
+    .scanline::after {
+      content: "";
+      position: absolute;
+      inset: 0;
+      background:
+        linear-gradient(rgba(255, 255, 255, 0.018) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(64, 224, 208, 0.012), transparent 52%, rgba(255, 255, 255, 0.012));
+      background-size: 100% 4px, 100% 100%;
+      pointer-events: none;
+      mix-blend-mode: screen;
+      opacity: 0.18;
+    }
+
+    @keyframes pulseField {
+      0%, 100% {
+        opacity: 0.9;
+        transform: scale(1);
+      }
+
+      50% {
+        opacity: 1;
+        transform: scale(1.02);
+      }
+    }
+
+    @keyframes spinField {
+      from {
+        transform: rotate(0deg);
+      }
+
+      to {
+        transform: rotate(360deg);
+      }
+    }
+
+    .video-frame,
+    .join-box,
+    .metric-card,
+    .gta-card {
+      backdrop-filter: blur(24px);
+    }
+
+    .video-frame {
+      position: relative;
+      overflow: hidden;
+    }
+
+    .video-frame::before {
+      content: "";
+      position: absolute;
+      inset: 0;
+      border: 0.5px solid rgba(255, 255, 255, 0.05);
+      border-radius: inherit;
+      pointer-events: none;
+    }
+
+    @media (max-width: 639px) {
+      .hero-art {
+        width: min(100%, 22rem);
+        padding: 0.8rem;
+      }
+
+      .section-heading::after {
+        letter-spacing: 0.22em;
+      }
+
+      .offer-card {
+        gap: 0.9rem;
+      }
+
+      .offer-meta {
+        justify-content: center;
+      }
+
+      .offer-hud {
+        justify-content: center;
+      }
+
+      .offer-side {
+        justify-items: center;
+      }
+
+      .offer-timer {
+        justify-self: center;
+      }
+
+      .offer-note {
+        letter-spacing: 0.2em;
+      }
+    }
+
+    @media (min-width: 1024px) {
+      .offer-card {
+        position: fixed;
+        top: 1.75rem;
+        right: 1.75rem;
+        width: min(34rem, calc(100vw - 3.5rem));
+        z-index: 35;
+      }
+
+      #join {
+        padding-top: 32rem;
+      }
+    }
+
+  </style>
+</head>
+<body class="font-sans text-graphite antialiased">
+  <div class="screen-fx" aria-hidden="true"></div>
+  <div class="mx-auto max-w-[1440px] px-4 py-4 sm:px-8 sm:py-6 lg:px-10 lg:py-8">
+    <main>
+      <section class="panel noise hero-grid fade-section rounded-[34px] px-5 py-10 sm:px-8 sm:py-12 lg:px-12 lg:py-14">
+        <div class="hero-stack space-y-8 sm:space-y-9">
+          <div class="space-y-5 sm:space-y-6">
+            <div class="hero-art">
+              <img src="ПОЛЕ.png" alt="ПОЛЕ icon">
+            </div>
+            <h1 class="font-display max-w-5xl text-5xl font-bold leading-[1.15] tracking-tighter sm:text-7xl lg:text-[5.5rem]">
+              <span class="text-rosso">ПОЛЕ</span>
+            </h1>
+            <p class="max-w-2xl text-lg leading-8 text-slate text-center sm:text-xl">
+              Пространство <span class="text-rosso font-extrabold">ЖИЗНИ</span>
+            </p>
+          </div>
+        </div>
+      </section>
+
+      <section class="panel scanline fade-section mt-4 rounded-[34px] px-5 py-10 sm:mt-5 sm:px-8 sm:py-12 lg:px-12 lg:py-14">
+        <div class="mb-8 flex flex-col gap-5 sm:mb-10 lg:flex-row lg:items-end lg:justify-between">
+          <div class="space-y-4">
+            <h2 class="font-display text-4xl font-bold leading-tight tracking-tighter2 sm:text-6xl">
+              Посмотри видео о <span class="text-rosso">ПОЛЕ</span>
+            </h2>
+          </div>
+        </div>
+        <div class="space-y-6 sm:space-y-8">
+          <div class="video-frame scanline aspect-video overflow-hidden rounded-[28px] border border-line bg-cloud shadow-panel">
+            <iframe
+              class="h-full w-full"
+              src="https://www.youtube.com/embed/dQw4w9WgXcQ?rel=0"
+              title="Видео о ПОЛЕ"
+              allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
+              referrerpolicy="strict-origin-when-cross-origin"
+              allowfullscreen
+            ></iframe>
+          </div>
+          <div class="section-divider flex flex-col gap-5 pt-6 sm:flex-row sm:items-center sm:justify-between">
+            <a href="https://app.lava.top/products/b37c3485-0cd2-459f-a069-209f7940ba15" class="cta-button inline-flex items-center gap-3 rounded-full px-8 py-4 text-sm font-semibold uppercase tracking-[0.16em] text-white transition duration-300">
+              Войти в ПОЛЕ за $15
+              <svg class="h-4 w-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                <path d="M5 12h14"></path>
+                <path d="m13 5 7 7-7 7"></path>
+              </svg>
+            </a>
+          </div>
+        </div>
+      </section>
+
+      <section class="panel fade-section mt-4 rounded-[34px] px-5 py-10 sm:mt-5 sm:px-8 sm:py-12 lg:px-12 lg:py-14">
+        <div class="map-overlay" aria-hidden="true"></div>
+        <div class="mb-10 max-w-4xl space-y-4 sm:mb-12">
+          <h2 class="font-display text-4xl font-bold tracking-tighter2 sm:text-6xl">Что ты <span class="text-rosso">найдёшь</span> внутри</h2>
+          <p class="text-lg leading-8 text-center text-slate">
+            Полный набор материалов и знаний, чтобы ты начал <span class="text-rosso font-extrabold">ЖИТЬ</span>
+          </p>
+        </div>
+
+        <div class="relative grid gap-5 sm:grid-cols-2 lg:grid-cols-3">
+          <article class="card-surface gta-card scanline flex h-full flex-col gap-8 rounded-[28px] border border-line bg-cloud p-8">
+            <i data-lucide="orbit" class="h-8 w-8 text-rosso"></i>
+            <div class="space-y-4">
+              <h3 class="text-2xl font-bold tracking-tighter2"><span class="font-extrabold">АУРА</span></h3>
+              <p class="leading-7 text-slate">Среда молодых ребят из интернета, которым важны энергия, глубина, любимое дело и движение без внутреннего раздрая.</p>
+            </div>
+          </article>
+
+          <article class="card-surface gta-card scanline flex h-full flex-col gap-8 rounded-[28px] border border-line bg-cloud p-8">
+            <i data-lucide="sparkles" class="h-8 w-8 text-rosso"></i>
+            <div class="space-y-4">
+              <h3 class="text-2xl font-bold tracking-tighter2"><span class="font-extrabold">ЖЕНЩИНЫ</span></h3>
+              <p class="leading-7 text-slate">Практики и настройки, с которых начинается ощущение: я больше не распыляюсь и двигаюсь туда, куда действительно хочу.</p>
+            </div>
+          </article>
+
+          <article class="card-surface gta-card scanline flex h-full flex-col gap-8 rounded-[28px] border border-line bg-cloud p-8">
+            <i data-lucide="badge-dollar-sign" class="h-8 w-8 text-rosso"></i>
+            <div class="space-y-4">
+              <h3 class="text-2xl font-bold tracking-tighter2"><span class="font-extrabold">ДЕНЬГИ</span></h3>
+              <p class="leading-7 text-slate">Материалы, которые помогают чувствовать себя собранно, принимать решения изнутри и не терять направление под внешним шумом.</p>
+            </div>
+          </article>
+        </div>
+      </section>
+
+      <section class="panel fade-section mt-4 rounded-[34px] px-5 py-10 sm:mt-5 sm:px-8 sm:py-12 lg:px-12 lg:py-14">
+        <div class="mb-10 max-w-4xl space-y-4 sm:mb-12">
+          <h2 class="font-display text-4xl font-bold tracking-tighter2 sm:text-6xl">
+            Почему <span class="text-rosso">ПОЛЕ</span> работает
+          </h2>
+        </div>
+
+        <div class="grid gap-4 lg:grid-cols-2">
+          <div class="card-surface gta-card scanline flex items-start gap-4 rounded-[26px] border border-line bg-cloud p-6 sm:gap-6">
+            <i data-lucide="compass" class="mt-1 h-5 w-5 shrink-0 text-rosso"></i>
+            <p class="max-w-4xl text-lg leading-8 text-graphite">
+              <span class="font-mono text-rosso">ПОЛЕ</span> создано для молодых людей, которые уже умеют зарабатывать в интернете, но хотят понять, где их настоящее направление и как расти без внутреннего хаоса.
+            </p>
+          </div>
+          <div class="card-surface gta-card scanline flex items-start gap-4 rounded-[26px] border border-line bg-cloud p-6 sm:gap-6">
+            <i data-lucide="map-pinned" class="mt-1 h-5 w-5 shrink-0 text-rosso"></i>
+            <p class="max-w-4xl text-lg leading-8 text-graphite">
+              После входа у тебя появляется не просто информация, а ощущение почвы под ногами: что делать, куда идти и почему именно туда.
+            </p>
+          </div>
+          <div class="card-surface gta-card scanline flex items-start gap-4 rounded-[26px] border border-line bg-cloud p-6 sm:gap-6">
+            <i data-lucide="waves" class="mt-1 h-5 w-5 shrink-0 text-rosso"></i>
+            <p class="max-w-4xl text-lg leading-8 text-graphite">Это мягкий, но мощный вход: сначала тебя собирает в одно целое, а затем естественно прогревает к более дорогим продуктам линейки.</p>
+          </div>
+          <div class="card-surface gta-card scanline flex items-start gap-4 rounded-[26px] border border-line bg-cloud p-6 sm:gap-6">
+            <i data-lucide="shield" class="mt-1 h-5 w-5 shrink-0 text-rosso"></i>
+            <p class="max-w-4xl text-lg leading-8 text-graphite">
+              Ты начинаешь двигаться не из тревоги и сравнения, а из внутренней тишины, опоры и чувства, что это действительно твоё.
+            </p>
+          </div>
+        </div>
+      </section>
+
+      <section id="join" class="panel noise fade-section mt-4 rounded-[34px] px-5 py-10 sm:mt-5 sm:px-8 sm:py-12 lg:px-12 lg:py-14">
+        <div class="grid gap-10 lg:grid-cols-[1.1fr_0.9fr] lg:items-end">
+          <div class="space-y-5 sm:space-y-6">
+            <div class="eyebrow">Точка входа</div>
+            <h2 class="font-display max-w-4xl text-4xl font-bold tracking-tighter2 sm:text-6xl">Готов <span class="text-rosso">начать</span> свой путь?</h2>
+            <p class="max-w-2xl text-lg leading-8 text-slate text-center">
+              Если тебе нужен не очередной курс, а первый настоящий контакт со своим делом, своей энергией и своей опорой, вход в <span class="text-rosso font-bold">ПОЛЕ</span> начинается здесь.
+            </p>
+          </div>
+          <div class="join-box offer-card scanline space-y-5 rounded-[28px] border border-line p-6 sm:space-y-6 sm:p-8 lg:ml-auto lg:max-w-md">
+            <div class="offer-hud">
+              <div class="offer-fist">
+                <img src="ПОЛЕ.png" alt="ПОЛЕ symbol">
+              </div>
+            </div>
+            <a href="https://app.lava.top/products/b37c3485-0cd2-459f-a069-209f7940ba15" class="cta-button inline-flex w-full items-center justify-center gap-3 rounded-full px-8 py-4 text-sm font-semibold uppercase tracking-[0.16em] text-white transition duration-300">
+              Войти в ПОЛЕ за $15
+              <svg class="h-4 w-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                <path d="M5 12h14"></path>
+                <path d="m13 5 7 7-7 7"></path>
+              </svg>
+            </a>
+            <p class="offer-copy"><span class="text-rosso font-bold">Один платёж.</span> Это базовый продукт линейки: техники, настройка состояния и первое сильное ощущение, что ты наконец-то нашёл своё.</p>
+            <p class="offer-note">
+              Платеж обрабатывается безопасно через <span class="text-graphite text-rosso">Lava</span>
+            </p>
+          </div>
+        </div>
+      </section>
+    </main>
+  </div>
+
+  <script src="https://unpkg.com/lucide@latest"></script>
+  <script>
+    const initLanding = () => {
+      if (!document.body) return;
+
+      if (window.lucide?.createIcons) {
+        window.lucide.createIcons({
+          attrs: {
+            width: 28,
+            height: 28,
+            stroke: "currentColor",
+            "stroke-width": 1.5,
+          },
+        });
+      }
+
+      const fadeSections = document.querySelectorAll(".fade-section");
+      const interactiveCards = document.querySelectorAll(".card-surface, .cta-button, .pitlane-trigger");
+      const setEtherealState = (element, active) => {
+        element.classList.toggle("is-ethereal-active", active);
+      };
+
+      interactiveCards.forEach((element) => {
+        element.addEventListener("mouseenter", () => setEtherealState(element, true));
+        element.addEventListener("mouseleave", () => setEtherealState(element, false));
+        element.addEventListener("focus", () => setEtherealState(element, true));
+        element.addEventListener("blur", () => setEtherealState(element, false));
+      });
+
+      const revealSection = (section) => {
+        section.classList.add("is-visible");
+      };
+
+      const observer = new IntersectionObserver(
+        (entries) => {
+          entries.forEach((entry) => {
+            if (entry.isIntersecting) {
+              revealSection(entry.target);
+              observer.unobserve(entry.target);
+            }
+          });
+        },
+        {
+          threshold: 0.08,
+          rootMargin: "0px 0px -10% 0px",
+        }
+      );
+
+      fadeSections.forEach((section) => {
+        const rect = section.getBoundingClientRect();
+        const isInitiallyVisible = rect.top < window.innerHeight * 0.92;
+
+        if (isInitiallyVisible) {
+          revealSection(section);
+          return;
+        }
+
+        observer.observe(section);
+      });
+    };
+
+    if (document.readyState === "loading" || !document.body) {
+      window.addEventListener("DOMContentLoaded", initLanding, { once: true });
+    } else {
+      initLanding();
+    }
+  </script>
+</body>
+</html>
